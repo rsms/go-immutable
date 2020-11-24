@@ -24,7 +24,7 @@ import (
   "github.com/rsms/go-immutable"
 )
 
-m := EmptyStrMap
+m := immutable.EmptyStrMap
 
 m1 := m.Set("Hello", 123)
 m2 := m.Set("Hello", 456).Set("Sun", 9)
