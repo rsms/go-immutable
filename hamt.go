@@ -25,11 +25,6 @@ type HAMT struct {
 // hcollision houses values with identical keys
 type hcollision []Value
 
-// HAMTEdit is data temporarily used during edits
-type HAMTEdit struct {
-	Resized int // >0 if an item was added or removed (depends on operation)
-}
-
 // Lookup retrieves the value for an entry identified by key+v
 func (m *HAMT) Lookup(key uint, v Value) Value {
 	shift := uint(0)
