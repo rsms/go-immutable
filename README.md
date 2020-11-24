@@ -1,4 +1,4 @@
-Immutable data structures for Go
+# Immutable data structures for Go
 
 [![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/rsms/go-immutable.svg)][godoc]
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/rsms/go-immutable)][godoc]
