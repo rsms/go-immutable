@@ -1,0 +1,9 @@
+.DS_Store
+*.o
+*.a
+*.gz
+* copy
+/*.sublime-*
+/_*
+*.test
+*.pprof
