@@ -50,10 +50,12 @@ func TestSetInsert(t *testing.T) {
 	}
 
 	s := EmptySet
+	assert.True(s.m.Empty())
 	for _, vpath := range vals {
 		s = s.Add(newValue(vpath))
 	}
 	assert.Equal(len(vals), s.Len)
+	assert.False(s.m.Empty())
 
 	// inserting the same values should not grow the set
 	for _, vpath := range vals {

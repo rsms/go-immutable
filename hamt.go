@@ -25,6 +25,11 @@ type HAMT struct {
 // hcollision houses values with identical keys
 type hcollision []Value
 
+// Empty returns true if the HAMT does not contain any entries
+func (m *HAMT) Empty() bool {
+	return m == nil || len(m.entries) == 0
+}
+
 // Lookup retrieves the value for an entry identified by key+v
 func (m *HAMT) Lookup(key uint, v Value) Value {
 	shift := uint(0)
