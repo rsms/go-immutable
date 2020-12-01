@@ -17,12 +17,12 @@ type StrValue struct {
 }
 
 func NewStrValue(s string) *StrValue {
-	return &StrValue{strHash(s), s}
+	return &StrValue{StrHash(s), s}
 }
 
 func (e *StrValue) Value() string { return e.K }
 func (e *StrValue) SetValue(s string) {
-	e.H = strHash(s)
+	e.H = StrHash(s)
 	e.K = s
 }
 
@@ -40,7 +40,7 @@ type StrKeyValue struct {
 }
 
 func NewStrKeyValue(key string, value interface{}) *StrKeyValue {
-	return &StrKeyValue{StrValue{strHash(key), key}, value}
+	return &StrKeyValue{StrValue{StrHash(key), key}, value}
 }
 
 func (e *StrKeyValue) Value() interface{}     { return e.V }

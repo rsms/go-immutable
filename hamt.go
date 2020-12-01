@@ -13,6 +13,7 @@ const uintMax uint = ^uint(0)
 const hamtBranches = uint(intSize)             // uint8(32)
 const hamtBits = uint(7 - (64 / hamtBranches)) // 32=5, 64=6
 const hamtMask = uint(hamtBranches) - 1        // 32=...0011111, 64=...0111111 (5 vs 6 bits set)
+const hamtMaxLevel = (64 / hamtBits) - 1       // The deepest level
 
 var EmptyHAMT = &HAMT{}
 
@@ -325,10 +326,77 @@ func (m *HAMT) repr(sb *strings.Builder, level uint, indent string) {
 		case hcollision:
 			sb.WriteString("collision")
 			for _, v := range e {
-				fmt.Fprintf(sb, "%s  - Value %s", indent, v)
+				fmt.Fprintf(sb, "%s  - Value %v", indent, v)
 			}
 		case Value:
-			fmt.Fprintf(sb, "Value %s", e)
+			fmt.Fprintf(sb, "Value %v", e)
 		}
 	}
+}
+
+func (m *HAMT) Iterator() *HAMTIterator {
+	it := &HAMTIterator{nstackz: 1}
+	it.nstack[0] = IteratorEntry{m, -1}
+	return it
+}
+
+// --------
+
+type IteratorEntry struct {
+	node  interface{}
+	index int
+}
+
+type HAMTIterator struct {
+	nstack  [hamtMaxLevel + 2]IteratorEntry
+	nstackz int
+	Value   // current value
+}
+
+func (it *HAMTIterator) Next() bool {
+	if it.nstackz == 0 {
+		return false
+	}
+	e := it.nstack[it.nstackz-1]
+	curr := e.node
+	// index := e.index
+	next_index := uint(e.index) + 1
+	// let (current_node, index) = self.node_stack[self.stack_size - 1].clone();
+	//  let next_index: usize = (index + 1) as usize;
+	fmt.Printf("\n[next] it.nstack=%v, it.nstackz=%v\n", it.nstack[:it.nstackz], it.nstackz)
+
+	switch n := curr.(type) {
+	case *HAMT:
+		fmt.Printf("[next] S1=HAMT\n")
+		if next_index == uint(len(n.entries)) {
+			fmt.Printf("[next] S1=HAMT, exit A\n")
+			it.nstackz--
+			return it.Next()
+		}
+		fmt.Printf("[next] S1=HAMT, cont. next_index=%v\n", next_index)
+		it.nstack[it.nstackz-1].index = int(next_index)
+		//let (_, ref mut stack_index) = self.node_stack[self.stack_size - 1];
+		// *stack_index = next_index as isize;
+		switch n := n.entries[next_index].(type) {
+		case *HAMT:
+			fmt.Printf("[next] S1=HAMT, entries[%d] is-a HAMT\n", next_index)
+			it.nstack[it.nstackz] = IteratorEntry{n, -1}
+			it.nstackz++
+			return it.Next()
+		case Value:
+			fmt.Printf("[next] S1=HAMT, entries[%d] is-a Value %v\n", next_index, n)
+			it.Value = n
+			return true
+		case hcollision:
+			fmt.Printf("[next] S1=HAMT, entries[%d] is-a hcollision\n", next_index)
+		}
+
+		//
+	case Value:
+		//
+	case hcollision:
+		//
+	}
+
+	return false
 }

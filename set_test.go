@@ -54,7 +54,7 @@ func TestSetInsert(t *testing.T) {
 	for _, vpath := range vals {
 		s = s.Add(newValue(vpath))
 	}
-	assert.Equal(len(vals), s.Len)
+	assert.Equal(len(vals), s.Len())
 	assert.False(s.m.Empty())
 
 	// inserting the same values should not grow the set
@@ -62,7 +62,7 @@ func TestSetInsert(t *testing.T) {
 		s = s.Add(newValue(vpath))
 	}
 	// t.Log(s.m.String())
-	assert.Equal(len(vals), s.Len)
+	assert.Equal(len(vals), s.Len())
 
 	// Get should return the expected value
 	for _, vpath := range vals {
@@ -95,7 +95,7 @@ func TestSetCollision(t *testing.T) {
 	s = s.Add(newCollidingValue("1", "1c"))
 	s = s.Add(newCollidingValue("1", "1d"))
 	// t.Log(s.m.String())
-	assert.Equal(10, s.Len)
+	assert.Equal(10, s.Len())
 	assert.Equal(cv1, s.Get(cv1))
 }
 
@@ -118,7 +118,7 @@ func TestSetDeleteCollision(t *testing.T) {
 			break
 		}
 	}
-	assert.Equal(4+len(cv), s.Len)
+	assert.Equal(4+len(cv), s.Len())
 	// t.Log(s.m.String())
 	for _, v := range cv {
 		s = s.Del(v)
@@ -126,7 +126,7 @@ func TestSetDeleteCollision(t *testing.T) {
 			break
 		}
 	}
-	assert.Equal(4, s.Len)
+	assert.Equal(4, s.Len())
 }
 
 func TestSetDeleteDeepBranches(t *testing.T) {
@@ -141,21 +141,21 @@ func TestSetDeleteDeepBranches(t *testing.T) {
 
 	s = s.Del(newValue("1/2"))
 	// t.Log(s.m.String())
-	assert.Equal(s.Len, 2)
+	assert.Equal(s.Len(), 2)
 	assert.NotNil(s.Get(newValue("1/1")))
 	assert.Nil(s.Get(newValue("1/2")))
 	assert.NotNil(s.Get(newValue("1/3")))
 
 	s = s.Del(newValue("1/3"))
 	// t.Log(s.m.String())
-	assert.Equal(s.Len, 1)
+	assert.Equal(s.Len(), 1)
 	assert.NotNil(s.Get(newValue("1/1")))
 	assert.Nil(s.Get(newValue("1/2")))
 	assert.Nil(s.Get(newValue("1/3")))
 
 	s = s.Del(newValue("1/1"))
 	// t.Log(s.m.String())
-	assert.Equal(s.Len, 0)
+	assert.Equal(s.Len(), 0)
 	assert.Nil(s.Get(newValue("1/1")))
 	assert.Nil(s.Get(newValue("1/2")))
 	assert.Nil(s.Get(newValue("1/3")))
@@ -168,7 +168,7 @@ func TestSetDeleteDeepBranches(t *testing.T) {
 	s = s.Add(newValue("1/2/1/2/1/1"))
 	s = s.Add(newValue("1/2/1/2/1/2"))
 	s = s.Add(newValue("1/2/1/2/1/3"))
-	assert.Equal(s.Len, 7)
+	assert.Equal(s.Len(), 7)
 	assert.NotNil(s.Get(newValue("1/1")))
 	assert.NotNil(s.Get(newValue("1/2/1/1/1/1")))
 	assert.NotNil(s.Get(newValue("1/2/1/1/1/2")))
@@ -183,7 +183,7 @@ func TestSetDeleteDeepBranches(t *testing.T) {
 	assert.Equal(s, s2)
 
 	// test successful delete
-	expectedLen := s.Len
+	expectedLen := s.Len()
 	for _, val := range []string{
 		"1/2/1/2/1/2",
 		"1/2/1/1/1/1",
@@ -195,7 +195,7 @@ func TestSetDeleteDeepBranches(t *testing.T) {
 	} {
 		s = s.Del(newValue(val))
 		expectedLen--
-		assert.Equal(expectedLen, s.Len)
+		assert.Equal(expectedLen, s.Len())
 		if !assert.Nil(s.Get(newValue(val))) {
 			break
 		}
@@ -219,7 +219,7 @@ func TestSetDeleteRootValues(t *testing.T) {
 		s2 := s.Del(newValue(delval + "/9")) // non-existing
 		assert.Equal(s, s2)
 		expectLen := len(vals) - 1
-		assert.Equal(s.Len, expectLen)
+		assert.Equal(s.Len(), expectLen)
 		assert.Nil(s.Get(newValue(delval)))
 		// del rest
 		for _, delval2 := range vals {
@@ -229,7 +229,7 @@ func TestSetDeleteRootValues(t *testing.T) {
 			assert.NotNil(s.Get(newValue(delval2)))
 			s = s.Del(newValue(delval2))
 			expectLen--
-			assert.Equal(s.Len, expectLen)
+			assert.Equal(s.Len(), expectLen)
 			assert.Nil(s.Get(newValue(delval2)))
 		}
 	}
@@ -309,14 +309,14 @@ func TestSetBenchmarkData(t *testing.T) {
 		m = m.Add(v)
 		found := m.Get(v)
 		assert.Equal(v, found, "get")
-		assert.Equal(i+1, m.Len, "len")
+		assert.Equal(i+1, m.Len(), "len")
 	}
 	// insert a second time should not grow the set
 	for i := 0; i < len(testData); i++ {
 		v := &testData[i]
 		m = m.Add(v)
 	}
-	assert.Equal(len(testData), m.Len, "final len")
+	assert.Equal(len(testData), m.Len(), "final len")
 
 	for i := 0; i < len(testData); i++ {
 		v := &testData[i]

@@ -34,13 +34,13 @@ func TestStrMap(t *testing.T) {
 	// t.Log(m.String())
 
 	// length should match vals (vals contains unique strings)
-	assert.Equal(len(vals), m.Len)
+	assert.Equal(len(vals), m.Len())
 
 	// inserting the same values should not grow the map
 	for _, sample := range vals {
 		m = m.Set(sample, sample)
 	}
-	assert.Equal(len(vals), m.Len)
+	assert.Equal(len(vals), m.Len())
 
 	// Get should return the expected value
 	for _, sample := range vals {
@@ -58,5 +58,5 @@ func TestStrMap(t *testing.T) {
 		// entry should no longer exist in m
 		assert.False(m.Has(sample))
 	}
-	assert.Equal(0, m.Len)
+	assert.Equal(0, m.Len())
 }

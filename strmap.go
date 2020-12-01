@@ -7,16 +7,19 @@ import (
 
 // StrMap stores string keys associated with any value in a HAMT structure
 type StrMap struct {
-	Len int   // number of entries
-	m   *HAMT // trie root
+	l int   // number of entries
+	m *HAMT // trie root
 }
 
 // The empty StrMap
 var EmptyStrMap = &StrMap{0, EmptyHAMT}
 
+// Len returns the number of entries
+func (m *StrMap) Len() int { return m.l }
+
 // Get finds value for key. Returns nil if not found.
 func (m *StrMap) Get(key string) interface{} {
-	v := StrKeyValue{StrValue{strHash(key), key}, nil}
+	v := StrKeyValue{StrValue{StrHash(key), key}, nil}
 	v2 := m.m.Lookup(v.H, &v)
 	if v2 != nil {
 		return v2.(*StrKeyValue).V
@@ -27,7 +30,7 @@ func (m *StrMap) Get(key string) interface{} {
 // GetCheck finds value for key and returns a boolean indicating success.
 // Useful alternative to Get in case nil values are stored in the map.
 func (m *StrMap) GetCheck(key string) (interface{}, bool) {
-	v := StrKeyValue{StrValue{strHash(key), key}, nil}
+	v := StrKeyValue{StrValue{StrHash(key), key}, nil}
 	v2 := m.m.Lookup(v.H, &v)
 	if v2 != nil {
 		return v2.(*StrKeyValue).V, true
@@ -37,29 +40,29 @@ func (m *StrMap) GetCheck(key string) (interface{}, bool) {
 
 // Has returns true if key is in m
 func (m *StrMap) Has(key string) bool {
-	v := StrKeyValue{StrValue{strHash(key), key}, nil}
+	v := StrKeyValue{StrValue{StrHash(key), key}, nil}
 	return m.m.Lookup(v.H, &v) != nil
 }
 
 // Set returns a StrMap with v
 func (m *StrMap) Set(key string, value interface{}) *StrMap {
-	v := &StrKeyValue{StrValue{strHash(key), key}, value}
-	len2 := m.Len + 1
+	v := &StrKeyValue{StrValue{StrHash(key), key}, value}
+	len2 := m.l + 1
 	m2 := m.m.Insert(0, v.H, v, &len2)
 	return &StrMap{len2, m2}
 }
 
 // Del returns a StrMap without v. If v is not found, returns the receiver.
 func (m *StrMap) Del(key string) *StrMap {
-	v := StrKeyValue{StrValue{strHash(key), key}, nil}
+	v := StrKeyValue{StrValue{StrHash(key), key}, nil}
 	m2 := m.m.Remove(v.H, &v)
 	if m2 == m.m {
 		return m // not found; no change
 	}
-	if m.Len == 1 {
+	if m.l == 1 {
 		return EmptyStrMap
 	}
-	return &StrMap{m.Len - 1, m2}
+	return &StrMap{m.l - 1, m2}
 }
 
 // Range iterates over all entries by calling f(k,v). If f returns false, iteration stops.
@@ -74,7 +77,7 @@ func (m *StrMap) Range(f func(key string, value interface{}) bool) {
 func (m *StrMap) String() string {
 	var sb strings.Builder
 	sep := ", "
-	if m.Len > 5 {
+	if m.l > 5 {
 		sep = ",\n  "
 		sb.WriteString("{\n  ")
 	} else {
@@ -90,7 +93,7 @@ func (m *StrMap) String() string {
 		fmt.Fprintf(&sb, "%q: %v", key, value)
 		return true
 	})
-	if m.Len > 5 {
+	if m.l > 5 {
 		sb.WriteString(",\n}")
 	} else {
 		sb.WriteByte('}')
